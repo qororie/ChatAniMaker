@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="316.18" height="265.92" version="1.1" viewBox="-15 -15 316.18 265.92"
+     xml:space="preserve"
+     xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink">
+
+  <style>
+    @keyframes blink {
+      0%, 96%, 100% { transform: scaleY(1); }
+      98% { transform: scaleY(0.1); }
+    }
+    .blink-eye {
+      transform-origin: center;
+      transform-box: fill-box;
+      animation: blink 8s infinite;
+    }
+    @keyframes shrug {
+      0%, 96%, 100% { transform: translateY(0); }
+      98% { transform: translateY(-5px); }
+    }
+    .shrug-left {
+      transform-origin: center;
+      transform-box: fill-box;
+      animation: shrug 8s infinite;
+    }
+    @keyframes shrug-down {
+      0%, 96%, 100% { transform: translateY(0); }
+      98% { transform: translateY(3px); }
+    }
+    .shrug-right {
+      transform-origin: center;
+      transform-box: fill-box;
+      animation: shrug-down 8s infinite;
+    }
+    @keyframes tiptoe {
+      0%, 96%, 100% { transform: scale(1, 1) translateY(0); }
+      98% { transform: scale(0.95, 1.15) translateY(-2px); }
+    }
+    .tiptoe-foot {
+      transform-origin: top center;
+      transform-box: fill-box;
+      animation: tiptoe 8s infinite;
+    }
+    @keyframes close-mouth {
+      0%, 96%, 100% { transform: scaleY(1); }
+      98% { transform: scaleY(0.7); }
+    }
+    .mouth-anim {
+      transform-origin: center;
+      transform-box: fill-box;
+      animation: close-mouth 8s infinite;
+    }
+    @keyframes sway-antenna {
+      0%, 100% { transform: rotate(-10deg); }
+      50% { transform: rotate(10deg); }
+    }
+    .antenna-anim {
+      transform-origin: bottom center;
+      transform-box: fill-box;
+      animation: sway-antenna 4s ease-in-out infinite;
+    }
+    @keyframes look-pupil {
+      0%, 20%, 100% { transform: translateX(0); }
+      30%, 50% { transform: translateX(12px); }
+      60%, 75% { transform: translateX(6px) translateY(2px); }
+      85%, 95% { transform: translateX(-4px); }
+    }
+    @keyframes look-white-r {
+      0%, 20%, 100% { transform: translateY(0); }
+      30%, 50% { transform: translateY(-4px); }
+      60%, 75% { transform: translateY(-1px); }
+      85%, 95% { transform: translateY(1px); }
+    }
+    @keyframes look-white-l {
+      0%, 20%, 100% { transform: translateY(0); }
+      30%, 50% { transform: translateY(4px); }
+      60%, 75% { transform: translateY(1px); }
+      85%, 95% { transform: translateY(-1px); }
+    }
+    .pupil-anim {
+      transform-origin: center;
+      transform-box: fill-box;
+      animation: look-pupil 24s ease-in-out infinite;
+    }
+    .white-r-anim {
+      transform-origin: center;
+      transform-box: fill-box;
+      animation: look-white-r 24s ease-in-out infinite;
+    }
+    .white-l-anim {
+      transform-origin: center;
+      transform-box: fill-box;
+      animation: look-white-l 24s ease-in-out infinite;
+    }
+  </style>
+
+  <!-- ========== アンテナ ========== -->
+  <g id="antenna" transform="translate(-.80154 -18.033)">
+    <g class="antenna-anim">
+      <path d="m126.18 18.033a15.282 14.302 0 00-15.281 14.303 15.282 14.302 0 0015.281 14.301
+               15.282 14.302 0 0010.334-3.8086l4.9473 15.172c2.4608-7.3823-1.3732-13.238-3.916-16.104
+               a15.282 14.302 0 003.916-9.5605 15.282 14.302 0 00-15.281-14.303z"
+            fill="#f23a30" style="paint-order:stroke fill markers"/>
+    </g>
+  </g>
+
+  <!-- ========== 胴体（メインボディ） ========== -->
+  <g id="main-body">
+    <path d="m254.93 121.15a110.89 88.359 0 01-110.89 88.359 110.89 88.359 0 01-110.89-88.359
+             110.89 88.359 0 01110.89-88.359 110.89 88.359 0 01110.89 88.359z"
+          fill="#f23a30"/>
+  </g>
+
+  <!-- ========== 右腕 ========== -->
+  <g id="arm-R" transform="translate(-.80154 -18.033)">
+    <g class="white-r-anim">
+      <g class="shrug-right">
+        <path d="m258.21 122.78c6.6186.00022 12.946 2.0498 17.492 5.6641
+                 4.4584 3.5433 6.823 8.288 6.5586 13.16h.0215v38.385h-24.295
+                 s.22265-47.595.22265-57.209z
+                 m11.541 59.191a17.224 14.22 0 0117.223 14.221 17.224 14.22 0 01-17.223 14.219
+                 17.224 14.22 0 01-17.225-14.219 17.224 14.22 0 0117.225-14.221z"
+              fill="#f23a30" style="paint-order:stroke fill markers"/>
+      </g>
+    </g>
+  </g>
+
+  <!-- ========== 左腕 ========== -->
+  <g id="arm-L" transform="translate(1.1 -18.033)">
+    <g class="white-l-anim">
+      <g class="shrug-left">
+        <path d="m29.565 111.85c-6.6186.00022-12.946 2.0498-17.492 5.6641
+                 -4.4583 3.5433-6.8229 8.288-6.5586 13.16h-.021484v38.385h24.295
+                 s-.22266-47.595-.22266-57.209z
+                 m-11.541 59.191a17.224 14.22 0 00-17.223 14.221 17.224 14.22 0 0017.223 14.219
+                 17.224 14.22 0 0017.225-14.219 17.224 14.22 0 00-17.225-14.221z"
+              fill="#f23a30" style="paint-order:stroke fill markers"/>
+      </g>
+    </g>
+  </g>
+
+  <!-- ========== 右目 ========== -->
+  <g class="blink-eye">
+    <g class="white-r-anim">
+      <!-- ========== 右目白目 ========== -->
+      <g id="eye-white-R" transform="translate(-.80154 -18.033)">
+        <path d="m205.72 125.39a22.139 24.294 0 01-22.139 24.294 22.139 24.294 0 01-22.139-24.294
+                 22.139 24.294 0 0122.139-24.294 22.139 24.294 0 0122.139 24.294z"
+              fill="#eae3f5" stroke-width="1.1121"/>
+      </g>
+
+      <!-- ========== 右目瞳 ========== -->
+      <g id="eye-pupil-R" transform="translate(-.80154 -18.033)">
+        <g class="pupil-anim">
+          <path d="m192.79 128.72a6.4653 6.4653 0 01-6.4653 6.4653 6.4653 6.4653 0 01-6.4653-6.4653
+                   6.4653 6.4653 0 016.4653-6.4653 6.4653 6.4653 0 016.4653 6.4653z"
+                fill="#404040"/>
+        </g>
+      </g>
+    </g>
+  </g>
+
+  <!-- ========== 左目 ========== -->
+  <g class="blink-eye">
+    <g class="white-l-anim">
+      <!-- ========== 左目白目 ========== -->
+      <g id="eye-white-L" transform="translate(-.80154 -18.033)">
+        <path d="m125.1 132.78a22.139 24.294 0 01-22.139 24.294 22.139 24.294 0 01-22.139-24.294
+                 22.139 24.294 0 0122.139-24.294 22.139 24.294 0 0122.139 24.294z"
+              fill="#eae3f5" stroke-width="1.1121"/>
+      </g>
+
+      <!-- ========== 左目瞳 ========== -->
+      <g id="eye-pupil-L" transform="translate(-.80154 -18.033)">
+        <g class="pupil-anim">
+          <path d="m112.18 136.11a6.4653 6.4653 0 01-6.4653 6.4653 6.4653 6.4653 0 01-6.4653-6.4653
+                   6.4653 6.4653 0 016.4653-6.4653 6.4653 6.4653 0 016.4653 6.4653z"
+                fill="#404040"/>
+        </g>
+      </g>
+    </g>
+  </g>
+
+  <!-- ========== 口 ========== -->
+  <g id="mouth" transform="translate(-.80154 -18.033)">
+    <g class="mouth-anim">
+      <rect x="99.918" y="168" width="90.906" height="32" rx="8" fill="#eae3f5"/>
+    </g>
+  </g>
+
+  <!-- ========== 右足 ========== -->
+  <g id="foot-R" transform="translate(-.80154 -18.033)">
+    <g class="white-r-anim">
+      <g class="tiptoe-foot">
+        <path d="m233.28 237.2a26.236 12.417 0 01-26.236 12.417 26.236 12.417 0 01-26.236-12.417
+                 26.236 12.417 0 0126.236-12.417 26.236 12.417 0 0126.236 12.417z"
+              fill="#f23a30" style="paint-order:stroke fill markers"/>
+      </g>
+    </g>
+  </g>
+
+  <!-- ========== 左足 ========== -->
+  <g id="foot-L" transform="translate(-.80154 -18.033)">
+    <g class="white-l-anim">
+      <g class="tiptoe-foot">
+        <path d="m126.18 241.54a26.236 12.417 0 01-26.236 12.417 26.236 12.417 0 01-26.236-12.417
+                 26.236 12.417 0 0126.236-12.417 26.236 12.417 0 0126.236 12.417z"
+              fill="#f23a30" style="paint-order:stroke fill markers"/>
+      </g>
+    </g>
+  </g>
+
+</svg>
