@@ -44,9 +44,9 @@ export const defaultCharacters = {
 };
 
 export const defaultScenario = [
-  { speaker: 'qororie', emotion: 'neutral', text: 'こんにちは！ワシ、コロリー！', displayText: '', currentEmotion: '' },
-  { speaker: 'piko', emotion: 'happy', text: 'やったぁ✨ ピョンピョン！', displayText: '', currentEmotion: '' },
-  { speaker: 'garo', emotion: 'sad', text: '...今日は気分が沈んでまして', displayText: '', currentEmotion: '' },
-  { speaker: 'luca', emotion: 'fall', text: 'ｱﾗ"ｧ"ｧ"ｧ"...☆', displayText: '', currentEmotion: '' },
-  { speaker: 'qororie', emotion: 'angry', text: 'なんやて！💢', displayText: '', currentEmotion: '' }
+  { speaker: 'qororie', emotion: 'neutral', text: 'チャットアニメをつくれるChatAniMaker (⊙_⊙)⚡', displayText: '', currentEmotion: '' },
+  { speaker: 'piko', emotion: 'happy', text: 'STEP1 | 「キャラ管理」であなたのキャラを登録するよ✨️☆彡', displayText: '', currentEmotion: '' },
+  { speaker: 'garo', emotion: 'sad', text: 'STEP2 | 「シナリオ」であなたのストーリーをつくってください。\nシナリオのダウンロードやインポートもできます！', displayText: '', currentEmotion: '' },
+  { speaker: 'luca', emotion: 'fall', text: '§тЁρ3 | 「チャットぁニメ」で再生してみてね •̩̩̩̩ᯅ•̩̩̩ ', displayText: '', currentEmotion: '' },
+  { speaker: 'qororie', emotion: 'angry', text: 'STEP4 | 「ダウンロード」できるよ ╭( ･ㅂ･)و  \nGIFアニメ、APNG、SVG！さらにWebMとAV1も!!(ಠ_ಠ)🔥', displayText: '', currentEmotion: '' }
 ];
