@@ -1,4 +1,4 @@
-import { createApp, ref, reactive, onMounted, nextTick, watch } from 'https://unpkg.com/vue@3.4.27/dist/vue.esm-browser.js';
+import { createApp, ref, reactive, onMounted, nextTick, watch } from './lib/vue.esm-browser.js';
 import { EMOTION_LABEL, defaultCharacters, defaultScenario } from './data.js';
 import { playScenario } from './player.js';
 import { exportGIF, exportAPNG, exportSVG, exportWebM, downloadBlob, loadGifLibs, loadApngLibs, loadWebMLibs } from './exporter.js';

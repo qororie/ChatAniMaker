@@ -15,19 +15,19 @@ export function loadScript(src) {
 }
 
 export async function loadGifLibs() {
-  await loadScript('https://cdn.jsdelivr.net/npm/html-to-image@1.11.13/dist/html-to-image.js');
-  await loadScript('https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.js');
+  await loadScript('./lib/html-to-image.js');
+  await loadScript('./lib/gif.js');
 }
 
 export async function loadApngLibs() {
-  await loadScript('https://cdn.jsdelivr.net/npm/html-to-image@1.11.13/dist/html-to-image.js');
-  await loadScript('https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js');
-  await loadScript('https://cdn.jsdelivr.net/npm/upng-js@2.1.0/UPNG.js');
+  await loadScript('./lib/html-to-image.js');
+  await loadScript('./lib/pako.min.js');
+  await loadScript('./lib/UPNG.js');
 }
 
 export async function loadWebMLibs() {
-  await loadScript('https://cdn.jsdelivr.net/npm/html-to-image@1.11.13/dist/html-to-image.js');
-  await loadScript('https://cdn.jsdelivr.net/npm/webm-muxer@5.0.2/build/webm-muxer.js');
+  await loadScript('./lib/html-to-image.js');
+  await loadScript('./lib/webm-muxer.js');
 }
 
 export function downloadBlob(blob, filename) {
@@ -57,7 +57,7 @@ function getStageSize(outputWidth) {
 let _cachedWorkerUrl = null;
 async function fetchWorkerAsBlob() {
   if (_cachedWorkerUrl) return _cachedWorkerUrl;
-  const WORKER_URL = 'https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.worker.js';
+  const WORKER_URL = './lib/gif.worker.js';
   const response = await fetch(WORKER_URL);
   if (!response.ok) throw new Error('gif.worker.js取得失敗');
   const code = await response.text();
