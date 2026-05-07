@@ -54,9 +54,6 @@
   <!-- iOSのホーム画面アイコン -->
   <link rel="apple-touch-icon" href="./icon-180.png">
 
-
-  <!-- ライブラリはエクスポート時に動的読み込みされるため削除（Lazy Load） -->
-
   <link rel="stylesheet" href="./style.css">
 </head>
 
@@ -88,6 +85,8 @@
             <div class="download-section" @click.stop>
               <span class="download-section-title">📐 出力サイズ（横幅）</span>
               <div class="size-buttons">
+                <button class="size-btn" :class="{ active: outputWidth === 375 }"
+                  @click="outputWidth = 375">375<br><small>モバイル</small></button>
                 <button class="size-btn" :class="{ active: outputWidth === 480 }"
                   @click="outputWidth = 480">480<br><small>軽量</small></button>
                 <button class="size-btn" :class="{ active: outputWidth === 720 }"
@@ -112,15 +111,6 @@
             </div>
 
             <!-- 🎬 形式選択ボタン -->
-            <button class="download-format" @click="downloadWebM('vp9')">
-              <strong>🎥 WebM動画 (VP9)</strong>
-              <small>爆速生成・軽量・幅広く対応</small>
-            </button>
-
-            <button class="download-format" @click="downloadWebM('av1')">
-              <strong>🎥 AV1動画 (WebM)</strong>
-              <small>次世代高圧縮・最高画質（一部端末非対応）</small>
-            </button>
 
             <button class="download-format" @click="downloadGif">
               <strong>🎬 GIFアニメ</strong>
@@ -135,6 +125,16 @@
             <button class="download-format" @click="downloadAnimSvg">
               <strong>🎞 アニメSVG</strong>
               <small>JS込み・▶ボタンで再生</small>
+            </button>
+
+            <button class="download-format" @click="downloadWebM('vp9')">
+              <strong>🎥 WebM動画 (VP9)</strong>
+              <small>爆速生成・軽量・幅広く対応</small>
+            </button>
+
+            <button class="download-format" @click="downloadWebM('av1')">
+              <strong>🎥 AV1動画 (WebM)</strong>
+              <small>次世代高圧縮・最高画質（一部端末非対応）</small>
             </button>
 
           </div>
@@ -462,11 +462,10 @@
 
   </div><!-- /#app -->
 
-  <!-- =====================================================
-     🚀 Vue3 アプリ本体
-     ===================================================== -->
+  <!-- 🚀 Vue3 アプリ本体-->
   <script type="module" src="./app.js"></script>
-
+    <script type="module" src="./lib/qororie-plugin.js"></script>
+    <p style="text-align: center; font-size: 0.8rem; color: var(--g); opacity: 0.8;">© 2026 Qororie PJ. All rights reserved. </p>
 </body>
 
 </html>

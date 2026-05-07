@@ -7,8 +7,8 @@ export function setupApp() {
   const appName = ref('ChatAniMaker');
   const activeTab = ref('anime');
   const showDownloadMenu = ref(false);
-  const fps = ref(15);
-  const outputWidth = ref(720);
+  const fps = ref(8);
+  const outputWidth = ref(480);
   const showProgress = ref(false);
   const progressTitle = ref('');
   const progressText = ref('');
