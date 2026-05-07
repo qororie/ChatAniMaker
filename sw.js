@@ -1,9 +1,9 @@
 // =============================================
 // Service Worker
 // キャッシュの名前（バージョンを変えると古いキャッシュが消える）
-// ファイルを更新したときは todo-cache-v1をv2, v3 と数字を上げて書き換える
+// ファイルを更新したときは todo-cache-v1を数字を上げて書き換える
 // =============================================
-const CACHE_NAME = 'todo-cache-v1.2'
+const CACHE_NAME = 'todo-cache-v1.3'
 
 // キャッシュするファイルの一覧
 const FILES_TO_CACHE = [
@@ -15,6 +15,10 @@ const FILES_TO_CACHE = [
   './exporter.js',
   './player.js',
   './style.css',
+
+  './composables/useCharacters.js',
+  './composables/useScenario.js',
+  './composables/useExport.js',
 
   './img/icon-180.png',
   './img/icon-192.png',
