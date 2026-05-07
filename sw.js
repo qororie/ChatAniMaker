@@ -3,27 +3,19 @@
 // キャッシュの名前（バージョンを変えると古いキャッシュが消える）
 // ファイルを更新したときは todo-cache-v1をv2, v3 と数字を上げて書き換える
 // =============================================
-const CACHE_NAME = 'todo-cache-v5'
+const CACHE_NAME = 'todo-cache-v6'
 
 // キャッシュするファイルの一覧
 const FILES_TO_CACHE = [
   './',
   './index.html',
   './manifest.json',
-  './img/',
-  './img/icon-192.png',
-  './img/icon-512.png',
-  './img/icon-180.png',
-  './img/image.svg',
-  './img/qororie-main.svg',
-  './lb/',
-  './lb/gif.js',
-  './lb/gif.worker.js',
-  './lb/html-to-image.js',
-  './lb/pako.min.js',
-  './lb/UPNG.js',
-  './lb/vue.esm-browser.js',
-  './lb/qororie-plugin.js',
+  './app.js',
+  './data.js',
+  './exporter.js',
+  './player.js',
+  './style.css',
+  './icon.svg'
 ]
 
 // ── インストール時（最初の1回だけ実行） ──
