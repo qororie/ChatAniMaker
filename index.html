@@ -1,167 +1,184 @@
 <!DOCTYPE html>
 <html lang="ja">
 
-<head>
+  <head>
 
-  <!-- =============================================
+    <!-- =============================================
     PWAのためにService Worker を登録する
     オフラインでも動くようにキャッシュを管理する
   ============================================= -->
-<script>
-  // Service Worker に対応しているブラウザかどうか確認する
-  // 古いブラウザには serviceWorker がないので確認してから使う
-  if ('serviceWorker' in navigator) {
-    // ページが読み込まれたあとに登録する
-    // （ページ表示を妨げないようにloadイベントの後に実行）
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(() => {
-          console.log('Service Worker 登録成功！')
+    <script>
+      // Service Worker に対応しているブラウザかどうか確認する
+      // 古いブラウザには serviceWorker がないので確認してから使う
+      if ('serviceWorker' in navigator) {
+        // ページが読み込まれたあとに登録する
+        // （ページ表示を妨げないようにloadイベントの後に実行）
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js')
+            .then(() => {
+              console.log('Service Worker 登録成功！')
+            })
+            .catch(err => {
+              console.log('Service Worker 登録失敗:', err)
+            })
         })
-        .catch(err => {
-          console.log('Service Worker 登録失敗:', err)
-        })
-    })
-  }
-</script>
+      }
+    </script>
 
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChatAniMaker - チャットアニメ作成ツール</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatAniMaker - チャットアニメ作成ツール</title>
 
-  <!-- ファビコン -->
-  <link rel="icon" href="./img/image.svg" type="image/svg+xml" />
+    <!-- ファビコン -->
+    <link rel="icon" href="./icon.svg" type="image/svg+xml" />
 
-  <!-- =============================================
+    <!-- =============================================
     PWA設定ファイルの読み込み
     manifest.json → アプリ名・アイコン・色などを定義したファイル
   ============================================= -->
-  <link rel="manifest" href="./manifest.json">
+    <link rel="manifest" href="./manifest.json">
 
-  <!-- =============================================
+    <!-- =============================================
     iOSのホーム画面追加用の設定
     Androidは manifest.json だけで対応できるが
     iOSは追加で apple- から始まるメタタグが必要
   ============================================= -->
-  <!-- iOSでブラウザのUIを隠してアプリっぽく動かす -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <!-- 新しい標準の書き方（AndroidのChromeも対応） -->
-  <meta name="mobile-web-app-capable" content="yes">
-  <!-- ステータスバー（時計や電池が表示される部分）の色 -->
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <!-- ホーム画面のアイコン下に表示される名前 -->
-  <meta name="apple-mobile-web-app-title" content="ChatAniMake">
-  <!-- iOSのホーム画面アイコン -->
-  <link rel="apple-touch-icon" href="./img/icon-180.png">
+    <!-- iOSでブラウザのUIを隠してアプリっぽく動かす -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <!-- 新しい標準の書き方（AndroidのChromeも対応） -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <!-- ステータスバー（時計や電池が表示される部分）の色 -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <!-- ホーム画面のアイコン下に表示される名前 -->
+    <meta name="apple-mobile-web-app-title" content="ChatAniMake">
+    <!-- iOSのホーム画面アイコン -->
+    <link rel="apple-touch-icon" href="./icon-180.png">
 
-  <link rel="stylesheet" href="./style.css">
-</head>
 
-<body>
 
-  <!-- ===========================================
+    <link rel="stylesheet" href="./style.css">
+  </head>
+
+  <body>
+
+    <!-- ===========================================
     Vue3 管理領域
     =========================================== -->
-  <div id="app">
+    <div id="app">
 
-    <!-- 🏠 ヘッダー -->
-    <header class="app-header">
+      <!-- 🏠 ヘッダー -->
+      <header class="app-header">
 
-      <div class="header-row">
-        <div style="display:flex; align-items:center; gap:8px;">
-          <span class="header-logo">🎬</span>
-          <span class="header-name">{{ appName }}</span>
-        </div>
+        <div class="header-row">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span class="header-logo">🎬</span>
+            <span class="header-name">{{ appName }}</span>
+          </div>
 
-        <!-- 💾 ダウンロードメニュー -->
-        <div class="download-menu" :class="{ open: showDownloadMenu }">
-          <button class="download-btn" @click="showDownloadMenu = !showDownloadMenu">
-            💾 ダウンロード <span class="caret">▼</span>
-          </button>
+          <!-- 💾 ダウンロードメニュー -->
+          <div class="download-menu" :class="{ open: showDownloadMenu }">
+            <button class="download-btn" @click="showDownloadMenu = !showDownloadMenu">
+              💾 ダウンロード <span class="caret">▼</span>
+            </button>
 
-          <div v-if="showDownloadMenu" class="download-options">
+            <div v-if="showDownloadMenu" class="download-options">
 
-            <!-- 📐 出力サイズ（横幅px、縦は最大9:16） -->
-            <div class="download-section" @click.stop>
-              <span class="download-section-title">📐 出力サイズ（横幅）</span>
-              <div class="size-buttons">
-                <button class="size-btn" :class="{ active: outputWidth === 375 }"
-                  @click="outputWidth = 375">375<br><small>モバイル</small></button>
-                <button class="size-btn" :class="{ active: outputWidth === 480 }"
-                  @click="outputWidth = 480">480<br><small>軽量</small></button>
-                <button class="size-btn" :class="{ active: outputWidth === 720 }"
-                  @click="outputWidth = 720">720<br><small>標準</small></button>
-                <button class="size-btn" :class="{ active: outputWidth === 1080 }"
-                  @click="outputWidth = 1080">1080<br><small>高画質</small></button>
+              <!-- 📐 出力サイズ（横幅px、縦は最大9:16） -->
+              <div class="download-section" @click.stop>
+                <span class="download-section-title">📐 出力サイズ（横幅）</span>
+                <div class="size-buttons">
+                  <button class="size-btn" :class="{ active: outputWidth === 480 }"
+                   @click="outputWidth = 480">480<br><small>軽量</small></button>
+                  <button class="size-btn" :class="{ active: outputWidth === 720 }"
+                   @click="outputWidth = 720">720<br><small>標準</small></button>
+                  <button class="size-btn" :class="{ active: outputWidth === 1080 }"
+                   @click="outputWidth = 1080">1080<br><small>高画質</small></button>
+                </div>
               </div>
-            </div>
 
-            <!-- 🎨 画質（共通fps） -->
-            <div class="download-section fps-row" @click.stop>
-              <span class="download-section-title">🎨 画質（GIF/APNG/WebP共通）</span>
-              <label>
-                <span>fps</span>
-                <span class="fps-value">{{ fps }}</span>
-              </label>
-              <input type="range" v-model.number="fps" min="1" max="30" step="1" class="fps-slider">
-              <div class="fps-hint">
-                <span>軽量(1)</span>
-                <span>ぬるぬる(30)</span>
+              <!-- 🎨 画質（共通fps） -->
+              <div class="download-section fps-row" @click.stop>
+                <span class="download-section-title">🎨 画質（GIF/APNG/WebP共通）</span>
+                <label>
+                  <span>fps</span>
+                  <span class="fps-value">{{ fps }}</span>
+                </label>
+                <input type="range" v-model.number="fps" min="1" max="30" step="1" class="fps-slider">
+                <div class="fps-hint">
+                  <span>軽量(1)</span>
+                  <span>ぬるぬる(30)</span>
+                </div>
               </div>
+
+              <!-- 🎬 形式選択ボタン -->
+              <button class="download-format" @click="downloadGif">
+                <strong>🎬 GIFアニメ</strong>
+                <small>SNSで使える定番形式</small>
+              </button>
+
+              <button class="download-format" @click="downloadApng">
+                <strong>🌈 APNGアニメ</strong>
+                <small>高画質・滑らか（X/Discord/LINE対応）</small>
+              </button>
+
+              <div class="download-section" @click.stop>
+                <span class="download-section-title">🎥 WebM比率</span>
+                <div class="aspect-buttons">
+                  <button class="aspect-btn" :class="{ active: webmAspectMode === 'content' }"
+                   @click="webmAspectMode = 'content'">ぴったり</button>
+                  <button class="aspect-btn" :class="{ active: webmAspectMode === '9:16' }"
+                   @click="webmAspectMode = '9:16'">9:16</button>
+                  <button class="aspect-btn" :class="{ active: webmAspectMode === '16:9' }"
+                   @click="webmAspectMode = '16:9'">16:9</button>
+                </div>
+              </div>
+
+              <button class="download-format" @click="downloadWebM('vp9')">
+                <strong>🎥 WebM動画 (VP9)</strong>
+                <small>爆速生成・軽量・幅広く対応</small>
+              </button>
+
+              <button class="download-format" @click="downloadWebM('av1')">
+                <strong>🎥 AV1動画 (WebM)</strong>
+                <small>次世代高圧縮・最高画質（一部端末非対応）</small>
+              </button>
+
+              <button class="download-format" @click="downloadAnimSvg">
+                <strong>🎞 アニメSVG</strong>
+                <small>JS込み・▶ボタンで再生</small>
+              </button>
+
+              <button class="download-format" @click="downloadEmbedHtml">
+                <strong>🌐 HTML埋め込みコード</strong>
+                <small>ページ本文に貼り付けやすい形式</small>
+              </button>
+
             </div>
-
-            <!-- 🎬 形式選択ボタン -->
-
-            <button class="download-format" @click="downloadGif">
-              <strong>🎬 GIFアニメ</strong>
-              <small>SNSで使える定番形式</small>
-            </button>
-
-            <button class="download-format" @click="downloadApng">
-              <strong>🌈 APNGアニメ</strong>
-              <small>高画質・滑らか（X/Discord/LINE対応）</small>
-            </button>
-
-            <button class="download-format" @click="downloadAnimSvg">
-              <strong>🎞 アニメSVG</strong>
-              <small>JS込み・▶ボタンで再生</small>
-            </button>
-
-            <button class="download-format" @click="downloadWebM('vp9')">
-              <strong>🎥 WebM動画 (VP9)</strong>
-              <small>爆速生成・軽量・幅広く対応</small>
-            </button>
-
-            <button class="download-format" @click="downloadWebM('av1')">
-              <strong>🎥 AV1動画 (WebM)</strong>
-              <small>次世代高圧縮・最高画質（一部端末非対応）</small>
-            </button>
-
           </div>
         </div>
-      </div>
 
-      <!-- タブナビ -->
-      <nav class="tabs">
-        <button class="tab-btn" :class="{ active: activeTab === 'anime' }" @click="activeTab = 'anime'">🎬
-          チャットアニメ</button>
-        <button class="tab-btn" :class="{ active: activeTab === 'script' }" @click="activeTab = 'script'">📝 台本</button>
-        <button class="tab-btn" :class="{ active: activeTab === 'chars' }" @click="activeTab = 'chars'">⚙️
-          キャラ管理</button>
-      </nav>
-    </header>
+        <!-- タブナビ -->
+        <nav class="tabs">
+          <button class="tab-btn" :class="{ active: activeTab === 'anime' }" @click="activeTab = 'anime'">🎬
+            チャットアニメ</button>
+          <button class="tab-btn" :class="{ active: activeTab === 'script' }" @click="activeTab = 'script'">📝
+            台本</button>
+          <button class="tab-btn" :class="{ active: activeTab === 'chars' }" @click="activeTab = 'chars'">⚙️
+            キャラ管理</button>
+        </nav>
+      </header>
 
-    <!-- 📦 メインコンテンツ -->
-    <main class="app-main">
+      <!-- 📦 メインコンテンツ -->
+      <main class="app-main">
 
-      <!-- 🎬 タブ：チャットアニメ -->
-      <section v-if="activeTab === 'anime'" class="tab-panel">
-        <div class="stage">
-          <div v-for="(msg, index) in state.scenario" :key="index" v-show="index < state.visibleCount" class="message"
-            :class="'face-' + state.characters[msg.speaker].facing">
+        <!-- 🎬 タブ：チャットアニメ -->
+        <section v-if="activeTab === 'anime'" class="tab-panel">
+          <div class="stage">
+            <div v-for="(msg, index) in state.scenario" :key="index" v-show="index < state.visibleCount" class="message"
+             :class="'face-' + state.characters[msg.speaker].facing">
 
-            <!-- アイコン -->
-            <div class="message-icon" :class="[
+              <!-- アイコン -->
+              <div class="message-icon" :class="[
                 'emotion-' + msg.currentEmotion,
                 'face-' + state.characters[msg.speaker].facing
                 ]" :style="[
@@ -174,10 +191,10 @@
                   },
                   state.isExporting ? msg.exportStyle : {}
                 ]">
-            </div>
+              </div>
 
-            <!-- バブル -->
-            <div class="message-bubble" :style="{
+              <!-- バブル -->
+              <div class="message-bubble" :style="{
                 background: state.characters[msg.speaker].bubbleFill,
                 border: state.characters[msg.speaker].bubbleStroke === 'none'
                         ? 'none'
@@ -188,284 +205,355 @@
                                 ? state.characters[msg.speaker].bubbleFill
                                 : state.characters[msg.speaker].bubbleStroke
                 }">
-              <div class="bubble-buttons">
-                <span class="btn-dot"></span>
-                <span class="btn-dot"></span>
-                <span class="btn-dot"></span>
-              </div>
-              <div class="bubble-text">
-                <span class="prompt" :style="{ color: state.characters[msg.speaker].promptColor }">
-                  {{ msg.speaker }} $
-                </span>
-                <span class="main-text">{{ msg.displayText }}</span>
-              </div>
-              <span class="bubble-tail-outer"></span>
-              <span class="bubble-tail-inner"></span>
-            </div>
-          </div>
-        </div>
-
-        <div class="controls">
-          <button class="replay-btn" :disabled="state.isPlaying" @click="play">
-            ▶ もう一度再生
-          </button>
-        </div>
-      </section>
-
-      <!-- 📝 タブ：台本 -->
-      <section v-if="activeTab === 'script'" class="tab-panel">
-        <div class="editor">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h2 style="margin: 0;">📝 台本編集</h2>
-            <select @change="handleScenarioOption($event)" style="padding: 6px; border-radius: 4px; border: 1px solid #ccc; font-family: inherit; font-size: 14px; cursor: pointer;">
-              <option value="" disabled selected>シナリオオプション ▼</option>
-              <option value="export">ダウンロード</option>
-              <option value="import">インポート</option>
-            </select>
-            <!-- インポート用の隠しファイル入力 -->
-            <input type="file" id="import-json" @change="importProject" accept=".json" style="display: none;">
-          </div>
-
-          <div v-for="(msg, index) in state.scenario" :key="index" class="msg-row">
-
-            <div class="msg-index">{{ index + 1 }}</div>
-
-            <div class="msg-move-group">
-              <button class="msg-move-btn" :disabled="index === 0" @click="moveMessage(index, -1)"
-                title="1つ上に移動">↑</button>
-              <button class="msg-move-btn" :disabled="index === state.scenario.length - 1" @click="moveMessage(index, 1)"
-                title="1つ下に移動">↓</button>
-            </div>
-
-            <select v-model="msg.speaker" class="msg-select">
-              <option v-for="(char, id) in state.characters" :key="id" :value="id">
-                {{ char.name }}
-              </option>
-            </select>
-
-            <select v-model="msg.emotion" class="msg-select">
-              <option v-for="(label, key) in EMOTION_LABEL" :key="key" :value="key">
-                {{ label }}
-              </option>
-            </select>
-
-            <div class="msg-input-wrap">
-              <textarea v-model="msg.text" class="msg-text-input" rows="3"
-                placeholder="セリフを入力（Shift+Enterで改行）"></textarea>
-              <span class="msg-counter">
-                文字数: {{ countWeightedLength(msg.text) }}
-              </span>
-            </div>
-
-            <button class="msg-delete-btn" @click="deleteMessage(index)" title="このメッセージを削除">×</button>
-          </div>
-
-          <button class="add-btn" @click="addMessage">
-            + メッセージを追加
-          </button>
-        </div>
-      </section>
-
-      <!-- ⚙️ タブ：キャラ管理 -->
-      <section v-if="activeTab === 'chars'" class="tab-panel">
-        <div class="char-manager">
-          <h2>⚙️ キャラ管理</h2>
-
-          <div v-for="(char, id) in state.characters" :key="id" class="char-card">
-
-            <div class="char-card-icon" :style="{
-              backgroundImage: `url(${char.iconUrl})`,
-              backgroundSize: 'contain',
-              backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat',
-              backgroundColor: 'transparent'
-            }">
-            </div>
-
-            <div class="char-card-info">
-              <div class="char-card-name">{{ char.name }}</div>
-              <div class="char-card-meta">
-                <span>{{ char.facing === 'right' ? '→ 右向き' : '← 左向き' }}</span>
-                <span>
-                  <span class="color-chip" :style="{ background: char.bubbleFill }"></span>
-                  背景
-                </span>
-                <span>
-                  <span class="color-chip" :style="{
-                        background: char.bubbleStroke === 'none' ? 'transparent' : char.bubbleStroke,
-                        borderStyle: char.bubbleStroke === 'none' ? 'dashed' : 'solid'
-                    }"></span>
-                  枠線
-                </span>
-                <span>
-                  <span class="color-chip" :style="{ background: char.textColor }"></span>
-                  本文
-                </span>
-              </div>
-            </div>
-
-            <button class="char-card-delete" :disabled="Object.keys(state.characters).length <= 1"
-              @click="deleteCharacter(id)" :title="`${char.name} を削除`">×</button>
-          </div>
-
-          <button class="add-btn" @click="openCharForm">
-            + 新規キャラ追加
-          </button>
-        </div>
-      </section>
-    </main>
-
-    <!-- 🪟 新規キャラ追加モーダル -->
-    <div v-if="showCharForm" class="modal-overlay" @click.self="closeCharForm">
-      <div class="modal-box">
-
-        <div class="modal-header">
-          <h3>➕ 新規キャラ追加</h3>
-          <button class="modal-close" @click="closeCharForm" title="閉じる">×</button>
-        </div>
-
-        <div class="modal-body">
-
-          <div class="form-row">
-            <label>キャラID（半角英数字）</label>
-            <input type="text" v-model="newChar.id" placeholder="例: hero" maxlength="20">
-            <small>scenarioで参照する識別子。後から変更できません</small>
-          </div>
-
-          <div class="form-row">
-            <label>表示名</label>
-            <input type="text" v-model="newChar.name" placeholder="例: ヒーロー" maxlength="20">
-          </div>
-
-          <div class="form-row">
-            <label>向き（こけアニメ等で使用）</label>
-            <div class="radio-row">
-              <label>
-                <input type="radio" v-model="newChar.facing" value="left">
-                ← 左向き
-              </label>
-              <label>
-                <input type="radio" v-model="newChar.facing" value="right">
-                → 右向き
-              </label>
-            </div>
-          </div>
-
-          <div class="form-row">
-            <label>アイコン画像（必須: PNG/JPEG/WebP）</label>
-            <input type="file" @change="handleIconUpload" accept="image/png, image/jpeg, image/webp"
-              style="margin-bottom: 8px;">
-            <div class="icon-preview" :style="{
-              backgroundImage: `url(${newChar.iconUrl})`,
-              backgroundSize: 'contain',
-              backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat',
-              backgroundColor: 'transparent'
-            }">
-            </div>
-          </div>
-
-          <div class="form-row">
-            <label>テーマ色（カード強調色）</label>
-            <div class="color-row">
-              <input type="color" v-model="newChar.color">
-              <span class="color-value">{{ newChar.color }}</span>
-            </div>
-          </div>
-
-          <div class="form-row">
-            <label>バブル背景色</label>
-            <div class="color-row">
-              <input type="color" v-model="newChar.bubbleFill">
-              <span class="color-value">{{ newChar.bubbleFill }}</span>
-            </div>
-          </div>
-
-          <div class="form-row">
-            <label>バブル枠線色</label>
-            <div class="color-row">
-              <input type="color" v-model="newChar.bubbleStroke" :disabled="newChar.bubbleNoStroke">
-              <span class="color-value">{{ newChar.bubbleStroke }}</span>
-              <label class="check-label">
-                <input type="checkbox" v-model="newChar.bubbleNoStroke">
-                枠線なし
-              </label>
-            </div>
-          </div>
-
-          <div class="form-row">
-            <label>プロンプト色（"name $"の色）</label>
-            <div class="color-row">
-              <input type="color" v-model="newChar.promptColor">
-              <span class="color-value">{{ newChar.promptColor }}</span>
-            </div>
-          </div>
-
-          <div class="form-row">
-            <label>本文色（セリフの色）</label>
-            <div class="color-row">
-              <input type="color" v-model="newChar.textColor">
-              <span class="color-value">{{ newChar.textColor }}</span>
-            </div>
-          </div>
-
-          <div class="form-row">
-            <label>プレビュー</label>
-            <div class="message preview-message" :class="'face-' + newChar.facing">
-              <div class="message-icon" :style="{
-                backgroundImage: `url(${newChar.iconUrl})`,
-                backgroundSize: 'contain',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat',
-                backgroundColor: 'transparent'
-              }">
-              </div>
-              <div class="message-bubble" :style="{
-                    background: newChar.bubbleFill,
-                    border: newChar.bubbleNoStroke ? 'none' : `1px solid ${newChar.bubbleStroke}`,
-                    color: newChar.textColor
-                }">
                 <div class="bubble-buttons">
                   <span class="btn-dot"></span>
                   <span class="btn-dot"></span>
                   <span class="btn-dot"></span>
                 </div>
                 <div class="bubble-text">
-                  <span class="prompt" :style="{ color: newChar.promptColor }">
-                    {{ newChar.id || 'id' }} $
+                  <span class="prompt" :style="{ color: state.characters[msg.speaker].promptColor }">
+                    {{ msg.speaker }} $
                   </span>
-                  <span class="main-text">こんにちは！</span>
+                  <span class="main-text">{{ msg.displayText }}</span>
                 </div>
+                <span class="bubble-tail-outer"></span>
+                <span class="bubble-tail-inner"></span>
               </div>
             </div>
           </div>
 
-        </div>
+          <div class="controls">
+            <button class="replay-btn" :disabled="state.isPlaying" @click="play">
+              ▶ もう一度再生
+            </button>
+          </div>
+        </section>
 
-        <div class="modal-footer">
-          <button class="btn-cancel" @click="closeCharForm">キャンセル</button>
-          <button class="btn-primary" @click="submitNewChar">追加</button>
+        <!-- 📝 タブ：台本 -->
+        <section v-if="activeTab === 'script'" class="tab-panel">
+          <div class="editor">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+              <h2 style="margin: 0;">📝 台本編集</h2>
+              <select @change="handleScenarioOption($event)"
+               style="padding: 6px; border-radius: 4px; border: 1px solid #ccc; font-family: inherit; font-size: 14px; cursor: pointer;">
+                <option value="" disabled selected>シナリオオプション ▼</option>
+                <option value="export">ダウンロード</option>
+                <option value="import">インポート</option>
+              </select>
+              <!-- インポート用の隠しファイル入力 -->
+              <input type="file" id="import-json" @change="importProject" accept=".json" style="display: none;">
+            </div>
+
+            <div v-for="(msg, index) in state.scenario" :key="index" class="msg-row">
+
+              <div class="msg-index">{{ index + 1 }}</div>
+
+              <div class="msg-move-group">
+                <button class="msg-move-btn" :disabled="index === 0" @click="moveMessage(index, -1)"
+                 title="1つ上に移動">↑</button>
+                <button class="msg-move-btn" :disabled="index === state.scenario.length - 1"
+                 @click="moveMessage(index, 1)" title="1つ下に移動">↓</button>
+              </div>
+
+              <select v-model="msg.speaker" class="msg-select">
+                <option v-for="(char, id) in state.characters" :key="id" :value="id">
+                  {{ char.name }}
+                </option>
+              </select>
+
+              <select v-model="msg.emotion" class="msg-select">
+                <option v-for="(label, key) in EMOTION_LABEL" :key="key" :value="key">
+                  {{ label }}
+                </option>
+              </select>
+
+              <div class="msg-input-wrap">
+                <textarea v-model="msg.text" class="msg-text-input" rows="3"
+                 placeholder="セリフを入力（Shift+Enterで改行）"></textarea>
+                <span class="msg-counter">
+                  文字数: {{ countWeightedLength(msg.text) }}
+                </span>
+              </div>
+
+              <button class="msg-delete-btn" @click="deleteMessage(index)" title="このメッセージを削除">×</button>
+            </div>
+
+            <button class="add-btn" @click="addMessage">
+              + メッセージを追加
+            </button>
+          </div>
+        </section>
+
+        <!-- ⚙️ タブ：キャラ管理 -->
+        <section v-if="activeTab === 'chars'" class="tab-panel">
+          <div class="char-manager">
+            <h2>⚙️ キャラ管理</h2>
+
+            <div v-for="(char, id) in state.characters" :key="id" class="char-card">
+
+              <div class="char-card-icon" :style="{
+              backgroundImage: `url(${char.iconUrl})`,
+              backgroundSize: 'contain',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+              backgroundColor: 'transparent'
+            }">
+              </div>
+
+              <div class="char-card-info">
+                <div class="char-card-name">{{ char.name }}</div>
+                <div class="char-card-meta">
+                  <span>{{ char.facing === 'right' ? '→ 右向き' : '← 左向き' }}</span>
+                  <span>
+                    <span class="color-chip" :style="{ background: char.bubbleFill }"></span>
+                    背景
+                  </span>
+                  <span>
+                    <span class="color-chip" :style="{
+                        background: char.bubbleStroke === 'none' ? 'transparent' : char.bubbleStroke,
+                        borderStyle: char.bubbleStroke === 'none' ? 'dashed' : 'solid'
+                    }"></span>
+                    枠線
+                  </span>
+                  <span>
+                    <span class="color-chip" :style="{ background: char.textColor }"></span>
+                    本文
+                  </span>
+                </div>
+              </div>
+
+              <div class="char-card-actions">
+                <button class="char-card-edit" @click="openEditCharForm(id)" :title="`${char.name} を編集`">編集</button>
+                <button class="char-card-delete" :disabled="Object.keys(state.characters).length <= 1"
+                 @click="deleteCharacter(id)" :title="`${char.name} を削除`">×</button>
+              </div>
+            </div>
+
+            <button class="add-btn" @click="openCharForm">
+              + 新規キャラ追加
+            </button>
+          </div>
+        </section>
+      </main>
+
+      <!-- 🪟 キャラ追加・編集モーダル -->
+      <div v-if="showCharForm" class="modal-overlay" @click.self="closeCharForm">
+        <div class="modal-box">
+
+          <div class="modal-header">
+            <h3>{{ charFormMode === 'edit' ? 'キャラ編集' : '新規キャラ追加' }}</h3>
+            <button class="modal-close" @click="closeCharForm" title="閉じる">×</button>
+          </div>
+
+          <div class="modal-body">
+
+            <div class="form-row">
+              <label>キャラID（半角英数字）</label>
+              <input type="text" v-model="newChar.id" placeholder="例: hero" maxlength="20"
+               :disabled="charFormMode === 'edit'">
+              <small>scenarioで参照する識別子。後から変更できません</small>
+            </div>
+
+            <div class="form-row">
+              <label>表示名</label>
+              <input type="text" v-model="newChar.name" placeholder="例: ヒーロー" maxlength="20">
+            </div>
+
+            <div class="form-row">
+              <label>向き</label>
+              <div class="radio-row">
+                <label>
+                  <input type="radio" v-model="newChar.facing" value="left">
+                  ← 左向き
+                </label>
+                <label>
+                  <input type="radio" v-model="newChar.facing" value="right">
+                  → 右向き
+                </label>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <label>アイコン画像（必須: PNG/JPEG/WebP）</label>
+              <input type="file" @change="handleIconUpload" accept="image/png, image/jpeg, image/webp"
+               style="margin-bottom: 8px;">
+              <div class="icon-preview" :style="{
+              backgroundImage: `url(${newChar.iconUrl})`,
+              backgroundSize: 'contain',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+              backgroundColor: 'transparent'
+            }">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <label>テーマ色（カード強調色）</label>
+              <div class="color-row">
+                <input type="color" v-model="newChar.color">
+                <span class="color-value">{{ newChar.color }}</span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <label>バブル背景色</label>
+              <div class="color-row">
+                <input type="color" v-model="newChar.bubbleFill">
+                <span class="color-value">{{ newChar.bubbleFill }}</span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <label>バブル枠線色</label>
+              <div class="color-row">
+                <input type="color" v-model="newChar.bubbleStroke" :disabled="newChar.bubbleNoStroke">
+                <span class="color-value">{{ newChar.bubbleStroke }}</span>
+                <label class="check-label">
+                  <input type="checkbox" v-model="newChar.bubbleNoStroke">
+                  枠線なし
+                </label>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <label>プロンプト色（"name $"の色）</label>
+              <div class="color-row">
+                <input type="color" v-model="newChar.promptColor">
+                <span class="color-value">{{ newChar.promptColor }}</span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <label>本文色（セリフの色）</label>
+              <div class="color-row">
+                <input type="color" v-model="newChar.textColor">
+                <span class="color-value">{{ newChar.textColor }}</span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <label>プレビュー</label>
+              <div class="message preview-message" :class="'face-' + newChar.facing">
+                <div class="message-icon" :style="{
+                backgroundImage: `url(${newChar.iconUrl})`,
+                backgroundSize: 'contain',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+                backgroundColor: 'transparent'
+              }">
+                </div>
+                <div class="message-bubble" :style="{
+                    background: newChar.bubbleFill,
+                    border: newChar.bubbleNoStroke ? 'none' : `1px solid ${newChar.bubbleStroke}`,
+                    color: newChar.textColor
+                }">
+                  <div class="bubble-buttons">
+                    <span class="btn-dot"></span>
+                    <span class="btn-dot"></span>
+                    <span class="btn-dot"></span>
+                  </div>
+                  <div class="bubble-text">
+                    <span class="prompt" :style="{ color: newChar.promptColor }">
+                      {{ newChar.id || 'id' }} $
+                    </span>
+                    <span class="main-text">こんにちは！</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="modal-footer">
+            <button class="btn-cancel" @click="closeCharForm">キャンセル</button>
+            <button class="btn-primary" @click="submitCharForm">
+              {{ charFormMode === 'edit' ? '保存' : '追加' }}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- 📊 進捗ダイアログ -->
-    <div v-if="showProgress" class="progress-overlay">
-      <div class="progress-box">
-        <div class="progress-title">{{ progressTitle }}</div>
-        <div class="progress-text">{{ progressText }}</div>
-        <div class="progress-bar">
-          <div class="progress-fill" :style="{ width: (progressRatio * 100) + '%' }"></div>
+      <!-- 📊 進捗ダイアログ -->
+      <div v-if="showProgress" class="progress-overlay">
+        <div class="progress-box">
+          <div class="progress-title">{{ progressTitle }}</div>
+          <div class="progress-text">{{ progressText }}</div>
+          <div class="progress-bar">
+            <div class="progress-fill" :style="{ width: (progressRatio * 100) + '%' }"></div>
+          </div>
         </div>
       </div>
+
+      <!-- 🖼 生成画像プレビュー -->
+      <div v-if="showMediaPreview" class="modal-overlay" @click.self="closeMediaPreview">
+        <div class="modal-box media-preview-box">
+
+          <div class="modal-header">
+            <h3>生成画像プレビュー</h3>
+            <button class="modal-close" @click="closeMediaPreview" title="閉じる">×</button>
+          </div>
+
+          <div class="modal-body media-preview-body">
+            <img v-if="mediaPreviewKind === 'image'" class="media-preview-image" :src="mediaPreviewUrl"
+             :alt="mediaPreviewTitle">
+            <video v-else-if="mediaPreviewKind === 'video'" class="media-preview-video" :src="mediaPreviewUrl" controls
+             autoplay muted loop playsinline></video>
+            <div v-else class="media-preview-file">{{ mediaPreviewFilename }}</div>
+            <div class="media-preview-meta">
+              <span>{{ mediaPreviewFilename }}</span>
+              <span>{{ mediaPreviewType }}</span>
+            </div>
+            <p class="media-preview-note">
+              スマホではプレビューを長押しして保存できます。共有またはダウンロードをご利用いただけます。
+            </p>
+          </div>
+
+          <div class="modal-footer">
+            <button class="btn-cancel" @click="downloadPreviewMedia">ダウンロード</button>
+            <button class="btn-primary" @click="sharePreviewMedia">共有</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 📋 HTMLコードプレビュー -->
+      <div v-if="showCodePreview" class="modal-overlay" @click.self="closeCodePreview">
+        <div class="modal-box code-preview-box">
+
+          <div class="modal-header">
+            <h3>HTML埋め込みコード</h3>
+            <button class="modal-close" @click="closeCodePreview" title="閉じる">×</button>
+          </div>
+
+          <div class="modal-body code-preview-body">
+            <textarea class="code-preview-text" :value="codePreviewText" readonly></textarea>
+            <p class="media-preview-note">
+              HTML本文に貼り付けて使えるコードです。
+            </p>
+            <div class="code-preview-status">{{ codePreviewStatus }}</div>
+          </div>
+
+          <div class="modal-footer">
+            <button class="btn-cancel" @click="downloadCodePreview">ダウンロード</button>
+            <button class="btn-primary" @click="copyCodePreview">コピー</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /#app -->
+
+    <div>
+      <footer class="app-footer">
+        <span class="copy">© 2026 QORORIE_PJ. </span>
+      </footer>
+
     </div>
 
-  </div><!-- /#app -->
+    <!-- =====================================================
+     🚀 Vue3 アプリ本体
+     ===================================================== -->
+    <script type="module" src="./app.js"></script>
+    <script src="lib/qororie-plugin.js"></script>
 
-  <!-- 🚀 Vue3 アプリ本体-->
-  <script type="module" src="./app.js"></script>
-  <script type="module" src="./lib/qororie-plugin.js"></script>
-    <p style="text-align: center; font-size: 0.8rem; color: var(--g); opacity: 0.8;">© 2026 Qororie PJ. All rights reserved. </p>
-</body>
+  </body>
 
 </html>

@@ -1,9 +1,9 @@
 // =============================================
 // Service Worker
 // キャッシュの名前（バージョンを変えると古いキャッシュが消える）
-// ファイルを更新したときは todo-cache-v1を数字を上げて書き換える
+// ファイルを更新したときは todo-cache-v1をv2, v3 と数字を上げて書き換える
 // =============================================
-const CACHE_NAME = 'todo-cache-v1.3'
+const CACHE_NAME = 'todo-cache-v7'
 
 // キャッシュするファイルの一覧
 const FILES_TO_CACHE = [
@@ -15,35 +15,21 @@ const FILES_TO_CACHE = [
   './exporter.js',
   './player.js',
   './style.css',
-
-  './composables/useCharacters.js',
-  './composables/useScenario.js',
-  './composables/useExport.js',
-
   './img/icon-180.png',
   './img/icon-192.png',
-  './img/icon-512.png',
-  './img/image.svg',
-  './img/qorori-main.svg',
-
-  './lib/gif.js',
-  './lib/gif.worker.js',
-  './lib/html-to-image.js',
-  './lib/pako.min.js',
-  './lib/UPNG.js',
-  './lib/vue.esm-browser.js',
-  './lib/webm-muxer.js',
-  './lib/qororie-plugin.js',
+  './img/icon-512.png'
 ]
 
 // ── インストール時（最初の1回だけ実行） ──
 // アプリに必要なファイルをキャッシュに保存する
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(FILES_TO_CACHE))
-      .then(() => self.skipWaiting())
+    caches.open(CACHE_NAME).then(cache => {
+      return cache.addAll(FILES_TO_CACHE)
+    })
   )
+  // 新しいService Workerをすぐに有効にする
+  self.skipWaiting()
 })
 
 // ── アクティベート時（新バージョンに切り替わるとき） ──
@@ -59,8 +45,10 @@ self.addEventListener('activate', event => {
           }
         })
       )
-    }).then(() => self.clients.claim())
+    })
   )
+  // すぐに全ページに新しいService Workerを適用する
+  self.clients.claim()
 })
 
 // ── フェッチ時（ページがファイルを要求するたびに実行） ──

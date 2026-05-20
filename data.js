@@ -44,9 +44,11 @@ export const defaultCharacters = {
 };
 
 export const defaultScenario = [
-  { speaker: 'qororie', emotion: 'neutral', text: 'チャットアニメをつくれるChatAniMaker (⊙_⊙)⚡', displayText: '', currentEmotion: '' },
-  { speaker: 'piko', emotion: 'happy', text: 'STEP1 | 「キャラ管理」であなたのキャラを登録するよ✨️☆彡', displayText: '', currentEmotion: '' },
-  { speaker: 'garo', emotion: 'sad', text: 'STEP2 | 「シナリオ」であなたのストーリーをつくってください。\nシナリオのダウンロードやインポートもできます！', displayText: '', currentEmotion: '' },
-  { speaker: 'luca', emotion: 'fall', text: '§тЁρ3 | 「チャットぁニメ」で再生してみてね •̩̩̩̩ᯅ•̩̩̩ ', displayText: '', currentEmotion: '' },
-  { speaker: 'qororie', emotion: 'angry', text: 'STEP4 | 「ダウンロード」できるよ ╭( ･ㅂ･)و  \nGIFアニメ、APNG、SVG！さらにWebMとAV1も!!(ಠ_ಠ)🔥', displayText: '', currentEmotion: '' }
+  { speaker: 'qororie', emotion: 'proud', text: 'チャットアニメをつくれるChatAniMaker (⊙_⊙)⚡', displayText: 'チャットアニメをつくれるChatAniMaker (⊙_⊙)⚡', currentEmotion: '' },
+  { speaker: 'piko', emotion: 'happy', text: "STEP1 | 「キャラ管理」であなたのキャラを登録するよ✨️☆彡", displayText: '', currentEmotion: '' },
+  { speaker: 'garo', emotion: 'sad', text: 'STEP2 | 「シナリオ」であなたのストーリーをつくってください。\nシナリオのダウンロードやインポートもできます！', displayText: 'STEP2 | 「シナリオ」であなたのストーリーをつくってください。\nシナリオのダウンロードやインポートもできます！', currentEmotion: '' },
+  { speaker: 'luca', emotion: 'fall', text: '§тЁρ3 | 「チャットぁニメ」で再生してみてね •̩̩̩̩ᯅ•̩̩̩ ', displayText: '§тЁρ3 | 「チャットぁニメ」で再生してみてね •̩̩̩̩ᯅ•̩̩̩ ', currentEmotion: '' },
+  {
+    speaker: 'qororie', emotion: 'surprise', text: 'STEP4 | 「ダウンロード」できるよ ╭( ･ㅂ･)و  \nGIFアニメ、APNG、SVG！さらにWebMとAV1も!!(ಠ_ಠ)🔥', displayText: 'STEP4 | 「ダウンロード」できるよ ╭( ･ㅂ･) و \nGIFアニメ、APNG、SVG！さらにWebMとAV1も!!(ಠ_ಠ)🔥', currentEmotion: ''
+  }
 ];
