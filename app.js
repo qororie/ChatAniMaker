@@ -8,6 +8,7 @@ export function setupApp() {
   const activeTab = ref('anime');
   const showDownloadMenu = ref(false);
   const fps = ref(15);
+  const loopCount = ref(0);
   const outputWidth = ref(720);
   const webmAspectMode = ref('content');
   const showProgress = ref(false);
@@ -316,6 +317,10 @@ export function setupApp() {
     progressRatio.value = ratio;
   }
 
+  function getAnimationLoopCount() {
+    return Number(loopCount.value) === -1 ? -1 : 0;
+  }
+
   function openMediaPreview(blob, filename, title) {
     closeMediaPreview();
     mediaPreviewBlob.value = blob;
@@ -388,7 +393,13 @@ export function setupApp() {
     try {
       handleProgress('ライブラリを読み込み中...', 0);
       await loadGifLibs();
-      const blob = await exportGIF(state, { fps: fps.value, outputWidth: outputWidth.value, nextTick, returnBlob: true }, handleProgress);
+      const blob = await exportGIF(state, {
+        fps: fps.value,
+        outputWidth: outputWidth.value,
+        loopCount: getAnimationLoopCount(),
+        nextTick,
+        returnBlob: true
+      }, handleProgress);
       openMediaPreview(blob, 'chat-anime.gif', 'ChatAniMaker GIF');
     } catch (err) {
       alert('GIF生成に失敗しました: ' + err.message);
@@ -431,7 +442,13 @@ export function setupApp() {
     try {
       handleProgress('ライブラリを読み込み中...', 0);
       await loadApngLibs();
-      const blob = await exportAPNG(state, { fps: fps.value, outputWidth: outputWidth.value, nextTick, returnBlob: true }, handleProgress);
+      const blob = await exportAPNG(state, {
+        fps: fps.value,
+        outputWidth: outputWidth.value,
+        loopCount: getAnimationLoopCount(),
+        nextTick,
+        returnBlob: true
+      }, handleProgress);
       openMediaPreview(blob, 'chat-anime.png', 'ChatAniMaker APNG');
     } catch (err) {
       alert('APNG生成に失敗しました: ' + err.message);
@@ -474,7 +491,7 @@ export function setupApp() {
 
   return {
     appName, activeTab,
-    showDownloadMenu, fps, outputWidth, webmAspectMode,
+    showDownloadMenu, fps, loopCount, outputWidth, webmAspectMode,
     showProgress, progressTitle, progressText, progressRatio,
     showMediaPreview, mediaPreviewUrl, mediaPreviewFilename, mediaPreviewTitle, mediaPreviewType, mediaPreviewKind,
     showCodePreview, codePreviewText, codePreviewStatus,

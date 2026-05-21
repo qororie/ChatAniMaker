@@ -83,6 +83,64 @@ function makeEven(value) {
   return value % 2 === 0 ? value : value + 1;
 }
 
+function normalizeLoopCount(value) {
+  return Number(value) === -1 ? -1 : 0;
+}
+
+function getApngPlayCount(loopCount) {
+  return loopCount === -1 ? 1 : 0;
+}
+
+let _crcTable = null;
+function getCrcTable() {
+  if (_crcTable) return _crcTable;
+  _crcTable = new Uint32Array(256);
+  for (let n = 0; n < 256; n++) {
+    let c = n;
+    for (let k = 0; k < 8; k++) {
+      c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+    }
+    _crcTable[n] = c >>> 0;
+  }
+  return _crcTable;
+}
+
+function readUint32(bytes, offset) {
+  return ((bytes[offset] << 24) | (bytes[offset + 1] << 16) | (bytes[offset + 2] << 8) | bytes[offset + 3]) >>> 0;
+}
+
+function writeUint32(bytes, offset, value) {
+  bytes[offset] = (value >>> 24) & 255;
+  bytes[offset + 1] = (value >>> 16) & 255;
+  bytes[offset + 2] = (value >>> 8) & 255;
+  bytes[offset + 3] = value & 255;
+}
+
+function crc32(bytes, offset, length) {
+  const table = getCrcTable();
+  let c = 0xFFFFFFFF;
+  for (let i = offset; i < offset + length; i++) {
+    c = table[(c ^ bytes[i]) & 255] ^ (c >>> 8);
+  }
+  return (c ^ 0xFFFFFFFF) >>> 0;
+}
+
+function patchApngPlayCount(buffer, playCount) {
+  const bytes = new Uint8Array(buffer);
+  let offset = 8;
+  while (offset + 12 <= bytes.length) {
+    const length = readUint32(bytes, offset);
+    const type = String.fromCharCode(bytes[offset + 4], bytes[offset + 5], bytes[offset + 6], bytes[offset + 7]);
+    if (type === 'acTL' && length >= 8) {
+      writeUint32(bytes, offset + 12, playCount);
+      writeUint32(bytes, offset + 8 + length, crc32(bytes, offset + 4, length + 4));
+      break;
+    }
+    offset += length + 12;
+  }
+  return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+}
+
 function getAspectSize(contentWidth, contentHeight, aspectMode) {
   if (aspectMode === '9:16') {
     let outputWidth = contentWidth;
@@ -437,6 +495,8 @@ async function fetchWorkerAsBlob() {
 
 export async function exportGIF(state, options, onProgress) {
   const frameDelay = Math.round(1000 / options.fps);
+  const loopCount = normalizeLoopCount(options.loopCount);
+  const tailDelayMs = 2000;
 
   state.visibleCount = state.scenario.length;
   state.scenario.forEach(msg => msg.displayText = msg.text);
@@ -453,7 +513,7 @@ export async function exportGIF(state, options, onProgress) {
     workers: 2, quality: 10,
     width, height,
     workerScript: workerUrl,
-    repeat: -1
+    repeat: loopCount
   });
 
   onProgress('アニメを録画中...', 0);
@@ -486,6 +546,29 @@ export async function exportGIF(state, options, onProgress) {
     await new Promise(r => requestAnimationFrame(r));
   }
 
+  if (loopCount !== -1 && tailDelayMs > 0) {
+    try {
+      renderStateAtTime(state, totalMs);
+      await options.nextTick();
+      const tailCanvas = await htmlToImage.toCanvas(stageEl, {
+        backgroundColor: '#F5F2E4',
+        pixelRatio: 1,
+        width: width,
+        height: height,
+        style: {
+          transform: `scale(${scale})`,
+          'transform-origin': 'top left',
+          width: stageEl.offsetWidth + 'px',
+          height: stageEl.offsetHeight + 'px',
+          margin: '0'
+        }
+      });
+      gif.addFrame(tailCanvas, { delay: tailDelayMs, copy: true });
+    } catch (e) {
+      console.warn('余韻フレーム追加失敗', e);
+    }
+  }
+
   onProgress('GIFを書き出し中...', 0.7);
   return new Promise((resolve, reject) => {
     gif.on('progress', (p) => {
@@ -509,6 +592,8 @@ export async function exportGIF(state, options, onProgress) {
 
 export async function exportAPNG(state, options, onProgress) {
   const frameDelay = Math.round(1000 / options.fps);
+  const loopCount = normalizeLoopCount(options.loopCount);
+  const tailDelayMs = 2000;
 
   state.visibleCount = state.scenario.length;
   state.scenario.forEach(msg => msg.displayText = msg.text);
@@ -570,10 +655,20 @@ export async function exportAPNG(state, options, onProgress) {
     throw new Error('フレームが1つも取得できませんでした');
   }
 
+  if (loopCount !== -1 && tailDelayMs > 0) {
+    const lastFrame = frames[frames.length - 1];
+    frames.push(lastFrame.slice(0));
+    delays.push(tailDelayMs);
+  }
+
   onProgress('APNGを書き出し中...', 0.7);
   await wait(50);
 
-  const apngBuffer = UPNG.encode(frames, FIXED_WIDTH, FIXED_HEIGHT, 256, delays);
+  const apngPlayCount = getApngPlayCount(loopCount);
+  const apngBuffer = patchApngPlayCount(
+    UPNG.encode(frames, FIXED_WIDTH, FIXED_HEIGHT, 256, delays, { loop: apngPlayCount }),
+    apngPlayCount
+  );
   onProgress('完了', 1.0);
   const blob = new Blob([apngBuffer], { type: 'image/png' });
 

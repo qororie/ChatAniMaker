@@ -113,6 +113,16 @@
                 </div>
               </div>
 
+              <div class="download-section" @click.stop>
+                <span class="download-section-title">🔁 再生方式（GIF/APNG）</span>
+                <div class="aspect-buttons">
+                  <button type="button" class="aspect-btn" :class="{ active: loopCount === -1 }"
+                   @click.prevent="loopCount = -1">1回だけ再生</button>
+                  <button type="button" class="aspect-btn" :class="{ active: loopCount === 0 }"
+                   @click.prevent="loopCount = 0">無限ループ</button>
+                </div>
+              </div>
+
               <!-- 🎬 形式選択ボタン -->
               <button class="download-format" @click="downloadGif">
                 <strong>🎬 GIFアニメ</strong>
