@@ -3,7 +3,7 @@
 // キャッシュの名前（バージョンを変えると古いキャッシュが消える）
 // ファイルを更新したときは todo-cache-v1をv2, v3 と数字を上げて書き換える
 // =============================================
-const CACHE_NAME = 'todo-cache-v7'
+const CACHE_NAME = 'todo-cache-v7.1'
 
 // キャッシュするファイルの一覧
 const FILES_TO_CACHE = [
